@@ -1,0 +1,3 @@
+apps:
+  - app_name: fideliscan
+    package_name: com.bessoustudio.fideliscan
