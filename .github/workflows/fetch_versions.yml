@@ -1,0 +1,32 @@
+name: Get Versions
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Tous les jours à 06h00 UTC
+  workflow_dispatch: # Permet aussi une exécution manuelle
+
+jobs:
+  fetch-version:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          pip install requests beautifulsoup4
+
+      - name: Fetch versions
+        run: |
+          python fetch_versions.py
+
+      - name: Commit version file
+        run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email 'actions@github.com'
+          while read file; do
+            git add "${file}.version"
+          done < version_files.txt
+          git diff --cached --quiet || git commit -m "Update versions"
+          git push
