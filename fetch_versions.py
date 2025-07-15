@@ -1,31 +1,48 @@
-import requests
-from bs4 import BeautifulSoup
-import yaml
+import urllib.request
+import re
+import json
 
-with open("apps.yaml", "r") as f:
-    apps = yaml.safe_load(f)["apps"]
+with open("apps.json", "r") as f:
+  apps = json.load(f)["apps"]
 
-headers = {
-    "User-Agent": "Mozilla/5.0"
-}
+# Régupère la version de l'application depuis le Play Store
+def get_playstore_version(play_store_id):
+    with urllib.request.urlopen("https://play.google.com/store/apps/details?id="+play_store_id) as response:
+        html = response.read().decode('utf-8')
+        match = re.search(r'\[\[\[\"(\d+\.\d+\.\d+)', html)
+        if match:
+            return match.group(1)
+        else:
+            return None
 
-def get_playstore_version(package_name):
-    url = f"https://play.google.com/store/apps/details?id={package_name}&hl=fr&gl=US"
-    response = requests.get(url, headers=headers)
-    soup = BeautifulSoup(response.content, "html.parser")
-    version = None
-    for div in soup.find_all("div", class_="W4P4ne"):
-        if "Version actuelle" in div.text or "Current Version" in div.text:
-            version = div.find_next_sibling().text.strip()
-            break
-    return version
+# Régupère la version de l'application depuis l'App Store
+def get_appstore_version(app_store_id):
+    url = f"https://itunes.apple.com/lookup?bundleId={app_store_id}"
+    with urllib.request.urlopen(url) as response:
+        body = response.read().decode('utf-8')
+        data = json.loads(body)
+        if data.get('resultCount') == 1:
+            v = data['results'][0]['version']
+            return v
+        else:
+            return None
 
 for app in apps:
     app_name = app["app_name"]
-    package_name = app["package_name"]
-    version = get_playstore_version(package_name)
-    if version:
+    playstore_package_name = app["play_store_id"]
+    appstore_package_name = app["app_store_id"]
+    playstore_version = get_playstore_version(playstore_package_name)
+    appstore_version = get_appstore_version(appstore_package_name)
+
+    # Préparation du contenu à écrire dans le fichier (json)
+    content = {
+        "app_name": app_name,
+        "play_store_version": playstore_version,
+        "app_store_version": appstore_version
+    }
+    
+    if content:
         with open(f"{app_name}.version", "w") as f:
-            f.write(version)
+            f.write(json.dumps(content, ensure_ascii=False, indent=2))
     else:
         print(f"Version not found for {app_name}")
