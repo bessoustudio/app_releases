@@ -1,0 +1,14 @@
+{
+  "apps": [
+    {
+      "app_name": "symbol_collection",
+      "app_store_id": "com.bessoustudio.symbolCollecion",
+      "play_store_id": ""
+    },
+    {
+      "app_name": "fideliscan",
+      "app_store_id": "com.bessoustudio.FideliScan",
+      "play_store_id": "com.bessoustudio.fideliscan"
+    }
+  ]
+}

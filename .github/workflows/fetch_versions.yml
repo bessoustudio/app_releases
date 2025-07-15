@@ -13,20 +13,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          persist-credentials: true  # facultatif, mais rassurant
+          persist-credentials: true
 
       - name: Debug git status
         run: |
           git status
           git remote -v
 
-      - name: Install dependencies
-        run: |
-          pip install requests beautifulsoup4 pyyaml
-
+      # Exécute le script Python pour récupérer les versions
       - name: Fetch versions
         run: |
-          python fetch_versions.py
+          python src/fetch_versions.py
 
       - name: Commit version file
         run: |
@@ -35,4 +32,4 @@ jobs:
           git config --global user.email 'actions@github.com'
           git add *.version || echo "No .version files to add"
           git diff --cached --quiet || git commit -m "Update versions"
-          git push || (echo "Git push failed"; git status; git log -2; exit 1)
+          git push
