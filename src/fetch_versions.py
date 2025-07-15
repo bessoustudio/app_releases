@@ -4,8 +4,8 @@ import json
 import time
 import os
 
-with open("apps.json", "r") as f:
-  apps = json.load(f)["apps"]
+with open(os.path.join(os.path.dirname(__file__), "apps.json"), "r") as f:
+    apps = json.load(f)["apps"]
 
 # Régupère la version de l'application depuis l'App Store
 # Retoune none en cas d'erreur ou si la version n'est pas trouvée
