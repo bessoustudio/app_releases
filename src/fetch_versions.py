@@ -56,7 +56,7 @@ for app in apps:
     
     if content:
         parent_dir = os.path.dirname(os.path.dirname(__file__))
-        file_path = os.path.join(parent_dir, f"{app_name}.version")
+        file_path = os.path.join(parent_dir, f"data/{app_name}.version")
         with open(file_path, "w") as f:
             f.write(json.dumps(content, ensure_ascii=False, indent=2))
     else:
